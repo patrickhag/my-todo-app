@@ -1,7 +1,7 @@
-import { todoSchema } from '@/lib/schema'
-import { ParamType } from '@/lib/types'
 import { db } from '@/src/db/drizzle'
 import { todo } from '@/src/db/schema'
+import { todoSchema } from '@/src/lib/schema'
+import { ParamType } from '@/src/lib/types'
 import { eq, not } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 
