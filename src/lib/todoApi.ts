@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_URL } from './utils'
+import { API_URL } from './definitions'
 import { TodoType } from './types'
 
 export async function getTodos() {
@@ -25,6 +25,23 @@ export async function addTodo(data: TodoType) {
   }
 }
 
+export async function updateStatusTodo(id: string) {
+  try {
+    const res = await axios.patch<TodoType>(`${API_URL}/${id}`)
+    return res
+  } catch (error: unknown) {
+    if (error instanceof Error) console.error(error.message)
+  }
+}
+
+export async function clearCompletedTodos() {
+  try {
+    const res = await axios.delete<TodoType>(`${API_URL}`)
+    return res
+  } catch (error: unknown) {
+    if (error instanceof Error) console.error(error.message)
+  }
+}
 export async function deleteTodo(id: string) {
   try {
     const res = await axios.delete<TodoType>(`${API_URL}/${id}`)
