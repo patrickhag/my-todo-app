@@ -5,4 +5,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const API_URL = 'https://my-todo-app-cyan-three.vercel.app/'
+export const API_URL = '/api/todos'

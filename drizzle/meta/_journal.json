@@ -29,6 +29,20 @@
       "when": 1722405125593,
       "tag": "0003_sparkling_kid_colt",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1722954610999,
+      "tag": "0004_powerful_metal_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1723198682430,
+      "tag": "0005_quick_king_cobra",
+      "breakpoints": true
     }
   ]
 }
