@@ -1,11 +1,9 @@
 import Image from 'next/image'
 import React from 'react'
-import { auth, signIn } from '@/src/auth'
+import { signIn } from '@/src/auth'
 import { Button } from '@/components/ui/button'
 
 export default async function Login() {
-  const session = await auth()
-
   ;('use client')
   return (
     <div className='flex items-center justify-center min-h-screen bg-[#F1ECE6]'>

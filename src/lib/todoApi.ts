@@ -42,3 +42,11 @@ export async function clearCompletedTodos() {
     if (error instanceof Error) console.error(error.message)
   }
 }
+export async function deleteTodo(id: string) {
+  try {
+    const res = await axios.delete<TodoType>(`${API_URL}/${id}`)
+    return res
+  } catch (error: unknown) {
+    if (error instanceof Error) console.error(error.message)
+  }
+}

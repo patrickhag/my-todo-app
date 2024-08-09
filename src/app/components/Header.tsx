@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { FaRegUserCircle } from 'react-icons/fa'
 import Modal from './Modal'
 import { auth } from '@/src/auth'
