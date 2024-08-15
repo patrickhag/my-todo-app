@@ -1,13 +1,26 @@
 'use client'
-import React from 'react'
-import { updateStatusTodo } from '@/src/lib/todoApi'
 import { TodoType } from '@/src/lib/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FaEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 import { SiTicktick } from 'react-icons/si'
+import { updateStatusTodo } from '@/src/lib/todoApi'
+import DeleteTodoModal from './DeleteModal'
+import EditTaskModal from './EditModal'
 
-export default function TodoItem({ todo }: { todo: TodoType }) {
+export default function TodoItem({
+  todo,
+  showDeleteModal,
+  handleShowDeleteModal,
+  showEditModal,
+  handleShowEditModal,
+}: {
+  todo: TodoType
+  showDeleteModal: boolean
+  handleShowDeleteModal: () => void
+  showEditModal: boolean
+  handleShowEditModal: () => void
+}) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -23,6 +36,14 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
 
   return (
     <>
+      {showDeleteModal && (
+        <DeleteTodoModal
+          showDeleteModal={showDeleteModal}
+          handleShowDeleteModal={handleShowDeleteModal}
+          taskId={todo.id!}
+        />
+      )}
+
       <li className='flex items-center justify-between mb-2 text-xl my-5'>
         <div className='flex items-center'>
           {todo.done ? (
@@ -35,7 +56,7 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
             <input
               type='radio'
               onClick={handleDoneTask}
-              className='border-[#737373] cursor-pointer appearance-none mr-2 w-2 h-2 border-2 rounded-full p-2'
+              className='border-[#737373] cursor-pointer appearance-none mr-2 border-2 rounded-full p-3'
             />
           )}
           <span
@@ -51,17 +72,26 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
             <MdDeleteOutline
               size={25}
               className='text-orange-300 hover:text-orange-500 mr-3'
+              onClick={handleShowDeleteModal}
             />
           </button>
           <button>
             <FaEdit
               size={20}
               className='text-orange-300 hover:text-orange-500'
+              onClick={handleShowEditModal}
             />
           </button>
         </div>
       </li>
       <div className='border-b border-b-[#76B7CD]'></div>
+
+      {showEditModal && (
+        <EditTaskModal
+          showEditModal={showEditModal}
+          handleShowEditModal={handleShowDeleteModal}
+        />
+      )}
     </>
   )
 }

@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1722331230920,
-      "tag": "0000_soft_clint_barton",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1722343664924,
-      "tag": "0001_rainy_meteorite",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1722404845300,
-      "tag": "0002_bizarre_squirrel_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1722405125593,
-      "tag": "0003_sparkling_kid_colt",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1722954610999,
-      "tag": "0004_powerful_metal_master",
+      "when": 1723618155122,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]
