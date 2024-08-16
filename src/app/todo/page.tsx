@@ -19,16 +19,6 @@ export default function Todo() {
   } = useForm<todoData>({ resolver: zodResolver(todoSchema) })
 
   const [showError, setShowError] = useState(false)
-  const [showDeleteModal, setShowModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-
-  const handleShowDeleteModal = () => {
-    setShowModal(!showDeleteModal)
-  }
-
-  const handleShowEditModal = () => {
-    setShowEditModal(!showEditModal)
-  }
 
   useEffect(() => {
     if (errors.text) {
@@ -65,14 +55,20 @@ export default function Todo() {
     },
   })
 
+  // sort based on the completeness the completed tasks be the last
+  const sortedTodos = data?.data.sort((a, b) => {
+    if (a.done && !b.done) {
+      return 1
+    }
+    if (!a.done && b.done) {
+      return -1
+    }
+    return 0
+  })
+
   return (
     <>
-      <div
-        className={`fixed inset-0 bg-black opacity-50 z-40 ${
-          showDeleteModal || showEditModal ? 'block' : 'hidden'
-        }`}
-      ></div>
-      <div className='container w-7/12'>
+      <div className='container sm:w-full md:w-9/12 lg:w-7/12'>
         <Header />
         <div className='mt-20'>
           <div className='relative mb-4'>
@@ -103,18 +99,11 @@ export default function Todo() {
             ) : (
               <ul>
                 {data?.data.map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    showDeleteModal={showDeleteModal}
-                    handleShowDeleteModal={handleShowDeleteModal}
-                    showEditModal={showEditModal}
-                    handleShowEditModal={handleShowEditModal}
-                  />
+                  <TodoItem key={todo.id} todo={todo} />
                 ))}
               </ul>
             )}
-            {data?.data.length === 0 && (
+            {sortedTodos?.length === 0 && (
               <p className='text-gray-400'>No tasks yet. Add them instead!</p>
             )}
             <div className='flex justify-end'>

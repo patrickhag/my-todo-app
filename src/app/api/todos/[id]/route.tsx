@@ -5,6 +5,7 @@ import { ParamType } from '@/src/lib/types'
 import { eq, not } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 
+/* UPDATE TODO */
 export async function PUT(req: NextRequest, { params }: { params: ParamType }) {
   try {
     const { id } = params
@@ -47,6 +48,7 @@ export async function PUT(req: NextRequest, { params }: { params: ParamType }) {
   }
 }
 
+/* DELETE TODO */
 export async function DELETE(
   req: NextRequest,
   { params }: { params: ParamType }
@@ -75,6 +77,7 @@ export async function DELETE(
   }
 }
 
+// UPDATE STATUS
 export async function PATCH(
   req: NextRequest,
   { params }: { params: ParamType }

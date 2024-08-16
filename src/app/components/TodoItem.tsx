@@ -4,25 +4,27 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FaEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 import { SiTicktick } from 'react-icons/si'
-import { updateStatusTodo } from '@/src/lib/todoApi'
-import DeleteTodoModal from './DeleteModal'
+import { deleteTodo, updateStatusTodo } from '@/src/lib/todoApi'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { useState } from 'react'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import EditTaskModal from './EditModal'
 
-export default function TodoItem({
-  todo,
-  showDeleteModal,
-  handleShowDeleteModal,
-  showEditModal,
-  handleShowEditModal,
-}: {
-  todo: TodoType
-  showDeleteModal: boolean
-  handleShowDeleteModal: () => void
-  showEditModal: boolean
-  handleShowEditModal: () => void
-}) {
+export default function TodoItem({ todo }: { todo: TodoType }) {
   const queryClient = useQueryClient()
-
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const mutation = useMutation({
     mutationFn: updateStatusTodo,
     onSuccess: () => {
@@ -34,17 +36,21 @@ export default function TodoItem({
     mutation.mutate(todo.id!)
   }
 
+  const deleteMutation = useMutation({
+    mutationFn: deleteTodo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] })
+      setIsDeleteDialogOpen(false)
+    },
+  })
+
+  const handleDeleteTodo = () => {
+    deleteMutation.mutate(todo.id!)
+  }
+
   return (
     <>
-      {showDeleteModal && (
-        <DeleteTodoModal
-          showDeleteModal={showDeleteModal}
-          handleShowDeleteModal={handleShowDeleteModal}
-          taskId={todo.id!}
-        />
-      )}
-
-      <li className='flex items-center justify-between mb-2 text-xl my-5'>
+      <li className='flex items-center justify-between mb-2 my-5'>
         <div className='flex items-center'>
           {todo.done ? (
             <SiTicktick
@@ -68,30 +74,52 @@ export default function TodoItem({
           </span>
         </div>
         <div className='flex'>
-          <button>
-            <MdDeleteOutline
-              size={25}
-              className='text-orange-300 hover:text-orange-500 mr-3'
-              onClick={handleShowDeleteModal}
+          <AlertDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+          >
+            <AlertDialogTrigger asChild>
+              <MdDeleteOutline
+                size={25}
+                className='text-orange-300 hover:text-orange-500 mr-3'
+                onClick={() => setIsDeleteDialogOpen(true)}
+              />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this task?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>No, Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteTodo}
+                  disabled={deleteMutation.isPending}
+                >
+                  {deleteMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogTrigger asChild>
+              <FaEdit
+                size={20}
+                className='text-orange-300 hover:text-orange-500'
+              />
+            </DialogTrigger>
+            <EditTaskModal
+              id={todo.id!}
+              task={todo.text}
+              description={todo.description!}
+              setIsEditDialogOpen={setIsEditDialogOpen}
             />
-          </button>
-          <button>
-            <FaEdit
-              size={20}
-              className='text-orange-300 hover:text-orange-500'
-              onClick={handleShowEditModal}
-            />
-          </button>
+          </Dialog>
         </div>
       </li>
       <div className='border-b border-b-[#76B7CD]'></div>
-
-      {showEditModal && (
-        <EditTaskModal
-          showEditModal={showEditModal}
-          handleShowEditModal={handleShowDeleteModal}
-        />
-      )}
     </>
   )
 }

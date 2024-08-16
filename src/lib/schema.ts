@@ -5,9 +5,6 @@ export const todoSchema = z.object({
     .string()
     .min(1, { message: 'Text is required' })
     .max(255, { message: 'Text is too long' })
-    .regex(/^[a-zA-Z0-9\s]+$/, {
-      message: 'Text can only contain alphanumeric characters and spaces',
-    })
     .trim(),
   description: z
     .string()
