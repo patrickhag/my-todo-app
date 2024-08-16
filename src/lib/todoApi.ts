@@ -50,3 +50,14 @@ export async function deleteTodo(id: string) {
     if (error instanceof Error) console.error(error.message)
   }
 }
+
+// update a todo using put
+
+export async function updateTodo(id: string, data: TodoType) {
+  try {
+    const res = await axios.put<TodoType>(`${API_URL}/${id}`, data)
+    return res
+  } catch (error: unknown) {
+    if (error instanceof Error) console.error(error.message)
+  }
+}
