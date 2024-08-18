@@ -2,8 +2,8 @@ import Image from 'next/image'
 import React, { useState } from 'react'
 import { FaRegUserCircle } from 'react-icons/fa'
 import Modal from './Modal'
-import { auth } from '@/src/auth'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 
 export default function Header() {
   const [openModal, setOpenModal] = useState(false)
@@ -12,7 +12,9 @@ export default function Header() {
   return (
     <div className='flex justify-between bg-[#F1ECE6] p-3 my-5 rounded-xl'>
       <div>
-        <Image src='/app-logo.svg' width={100} height={100} alt='App logo' />
+        <Link href='/'>
+          <Image src='/app-logo.svg' width={100} height={100} alt='App logo' />
+        </Link>
       </div>
       <div className='relative'>
         {session?.user?.image ? (

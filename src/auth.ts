@@ -3,18 +3,22 @@ import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 import { db } from './db/drizzle'
 
-export const { handlers, signIn, signOut, auth } = NextAuth(() => {
-  return {
-    session: { strategy: 'jwt' },
-    adapter: DrizzleAdapter(db),
-    providers: [Google],
-    callbacks: {
-      authorized: async ({ auth }) => {
-        return !!auth
-      },
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  session: { strategy: 'jwt' },
+  adapter: DrizzleAdapter(db),
+  providers: [Google],
+  callbacks: {
+    authorized: async ({ auth }) => {
+      return !!auth
     },
-    pages: {
-      signIn: '/',
+    async session({ session, token }) {
+      if (token?.sub) {
+        session.user.id = token.sub
+      }
+      return session
     },
-  }
+  },
+  pages: {
+    signIn: '/',
+  },
 })
