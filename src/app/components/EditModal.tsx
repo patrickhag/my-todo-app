@@ -1,17 +1,16 @@
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
+import { Button } from './ui/button'
 import {
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from './ui/dialog'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
 import { updateTodo } from '@/src/lib/todoApi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TodoType } from '@/src/lib/types'
 import { todoData, todoSchema } from '@/src/lib/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -74,12 +73,16 @@ export default function EditTaskModal({
           </Label>
           <Input
             id='description'
-            {...register('description', { required: false })}
+            {...register('description')}
             className='col-span-3'
           />
         </div>
         <DialogFooter>
-          <Button type='submit' disabled={isSubmitting || mutation.isPending}>
+          <Button
+            type='submit'
+            disabled={isSubmitting || mutation.isPending}
+            className='bg-blue-500'
+          >
             {isSubmitting || mutation.isPending ? 'Saving...' : 'Save changes'}
           </Button>
         </DialogFooter>

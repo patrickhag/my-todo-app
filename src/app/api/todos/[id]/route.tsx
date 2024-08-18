@@ -1,9 +1,79 @@
 import { db } from '@/src/db/drizzle'
-import { todo } from '@/src/db/schema'
+import { todo, users } from '@/src/db/schema'
 import { todoSchema } from '@/src/lib/schema'
 import { ParamType } from '@/src/lib/types'
-import { eq, not } from 'drizzle-orm'
+import { asc, eq, not } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(req: NextRequest, { params }: { params: ParamType }) {
+  try {
+    const { id } = params
+    const todos = await db
+      .select()
+      .from(todo)
+      .orderBy(asc(todo.done))
+      .where(eq(todo.userId, id))
+
+    return NextResponse.json(todos)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to fetch to-dos' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: ParamType }
+) {
+  try {
+    const { id } = params
+
+    const user = await db.select().from(users).where(eq(users.id, id)).limit(1)
+
+    if (user === undefined || user.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const { text, description } = await req.json()
+
+    const existingTodo = await db.select().from(todo).where(eq(todo.text, text))
+
+    if (existingTodo.length > 0) {
+      return NextResponse.json(
+        { error: 'Todo already exists' },
+        { status: 400 }
+      )
+    }
+
+    const validation = todoSchema.safeParse({ text, description })
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.errors[0].message },
+        { status: 400 }
+      )
+    }
+
+    const newTodo = {
+      userId: id,
+      text,
+      description,
+      done: false,
+    }
+
+    await db.insert(todo).values(newTodo)
+
+    return NextResponse.json({ status: 201 })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      { error: 'Failed to create a new to-do' },
+      { status: 500 }
+    )
+  }
+}
 
 /* UPDATE TODO */
 export async function PUT(req: NextRequest, { params }: { params: ParamType }) {

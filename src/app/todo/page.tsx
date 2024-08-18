@@ -2,13 +2,14 @@
 import React, { useEffect, useState } from 'react'
 import { todoData, todoSchema } from '@/src/lib/schema'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import Header from '../components/Header'
 import { FcDeleteDatabase } from 'react-icons/fc'
 import TodoItem from '../components/TodoItem'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
 import { addTodo, clearCompletedTodos, getTodos } from '@/src/lib/todoApi'
+import Header from '../components/Header'
+import { Button } from '../components/ui/button'
+import { useSession } from 'next-auth/react'
 
 export default function Todo() {
   const {
@@ -19,6 +20,10 @@ export default function Todo() {
   } = useForm<todoData>({ resolver: zodResolver(todoSchema) })
 
   const [showError, setShowError] = useState(false)
+
+  const { data: session } = useSession()
+
+  const userId = session?.user?.id
 
   useEffect(() => {
     if (errors.text) {
@@ -32,12 +37,20 @@ export default function Todo() {
   }, [errors.text])
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['todos'],
-    queryFn: async () => await getTodos(),
+    queryKey: ['todos'] || [],
+    queryFn: async () => await getTodos(userId!),
   })
 
+  const todoData = data?.data
+
   const addTodoMutation = useMutation({
-    mutationFn: addTodo,
+    mutationFn: ({
+      userId,
+      data,
+    }: {
+      userId: string | undefined
+      data: todoData
+    }) => addTodo(userId!, data),
     onSuccess: () => {
       refetch()
       reset()
@@ -45,7 +58,7 @@ export default function Todo() {
   })
 
   const onSubmit: SubmitHandler<todoData> = (data) => {
-    addTodoMutation.mutate(data)
+    addTodoMutation.mutate({ userId, data })
   }
 
   const clearCompletedTodosMutation = useMutation({
@@ -55,20 +68,9 @@ export default function Todo() {
     },
   })
 
-  // sort based on the completeness the completed tasks be the last
-  const sortedTodos = data?.data.sort((a, b) => {
-    if (a.done && !b.done) {
-      return 1
-    }
-    if (!a.done && b.done) {
-      return -1
-    }
-    return 0
-  })
-
   return (
     <>
-      <div className='container sm:w-full md:w-9/12 lg:w-7/12'>
+      <div className='container px-5 sm:w-full md:w-9/12 lg:w-7/12'>
         <Header />
         <div className='mt-20'>
           <div className='relative mb-4'>
@@ -81,7 +83,10 @@ export default function Todo() {
                 placeholder='What do you need to do?'
               />
 
-              <Button className='absolute right-0 top-0 min-h-full px-4 text-white bg-blue-500 rounded-lg'>
+              <Button
+                className='absolute right-0 top-0 min-h-full px-4 text-white bg-blue-500 rounded-lg'
+                type='submit'
+              >
                 {addTodoMutation.isPending ? 'Adding...' : 'Add'}
               </Button>
             </form>
@@ -93,32 +98,34 @@ export default function Todo() {
           )}
           <div className='bg-[#F1ECE6] shadow-md rounded-xl p-6'>
             {isLoading ? (
-              <p>Loading ...</p>
+              <p>Loading...</p>
             ) : isError ? (
-              <p>Retrying ...</p>
+              <p>Retrying...</p>
             ) : (
               <ul>
-                {data?.data.map((todo) => (
+                {todoData?.map((todo) => (
                   <TodoItem key={todo.id} todo={todo} />
                 ))}
               </ul>
             )}
-            {sortedTodos?.length === 0 && (
+            {todoData?.length === 0 && (
               <p className='text-gray-400'>No tasks yet. Add them instead!</p>
             )}
-            <div className='flex justify-end'>
-              <Button
-                className='mt-4 flex items-center space-x-2 border bg-blue-500'
-                onClick={() => clearCompletedTodosMutation.mutate()}
-              >
-                <FcDeleteDatabase />
-                <span>
-                  {clearCompletedTodosMutation.isPending
-                    ? 'Clearing...'
-                    : 'Clear completed'}
-                </span>
-              </Button>
-            </div>
+            {(todoData?.length ?? 0) > 0 && (
+              <div className='flex justify-end'>
+                <Button
+                  className='mt-4 flex items-center space-x-2 border bg-blue-500'
+                  onClick={() => clearCompletedTodosMutation.mutate()}
+                >
+                  <FcDeleteDatabase />
+                  <span>
+                    {clearCompletedTodosMutation.isPending
+                      ? 'Clearing...'
+                      : 'Clear completed'}
+                  </span>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

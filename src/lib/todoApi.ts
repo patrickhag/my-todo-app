@@ -2,18 +2,20 @@ import axios from 'axios'
 import { API_URL } from './definitions'
 import { TodoType } from './types'
 
-export async function getTodos() {
+export async function getTodos(userId: string) {
   try {
-    const data = await axios.get<TodoType[]>(API_URL)
+    const id = userId
+    const data = await axios.get<TodoType[]>(`${API_URL}/${id}`)
     return data
   } catch (error: unknown) {
     if (error instanceof Error) console.error(error.message)
   }
 }
 
-export async function addTodo(data: TodoType) {
+export async function addTodo(userId: string, data: TodoType) {
+  const id = userId
   try {
-    const res = await axios.post<TodoType>(API_URL, data, {
+    const res = await axios.post<TodoType>(`${API_URL}/${id}`, data, {
       headers: {
         'Content-type': 'application/json',
       },

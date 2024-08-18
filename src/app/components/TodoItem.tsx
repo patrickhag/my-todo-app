@@ -15,10 +15,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
+} from '@/src/app/components/ui/alert-dialog'
 import { useState } from 'react'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+import { Dialog, DialogTrigger } from './ui/dialog'
 import EditTaskModal from './EditModal'
 
 export default function TodoItem({ todo }: { todo: TodoType }) {
@@ -63,6 +62,7 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
               type='radio'
               onClick={handleDoneTask}
               className='border-[#737373] cursor-pointer appearance-none mr-2 border-2 rounded-full p-3'
+              title='Mark as done'
             />
           )}
           <span
@@ -74,14 +74,11 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
           </span>
         </div>
         <div className='flex'>
-          <AlertDialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-          >
+          <AlertDialog open={isDeleteDialogOpen}>
             <AlertDialogTrigger asChild>
               <MdDeleteOutline
                 size={25}
-                className='text-orange-300 hover:text-orange-500 mr-3'
+                className='text-orange-300 hover:text-orange-500 mr-3 cursor-pointer'
                 onClick={() => setIsDeleteDialogOpen(true)}
               />
             </AlertDialogTrigger>
@@ -93,10 +90,13 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>No, Cancel</AlertDialogCancel>
+                <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
+                  No, Cancel
+                </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDeleteTodo}
                   disabled={deleteMutation.isPending}
+                  className='bg-red-600 hover:bg-red-800 '
                 >
                   {deleteMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
                 </AlertDialogAction>
@@ -107,7 +107,7 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
             <DialogTrigger asChild>
               <FaEdit
                 size={20}
-                className='text-orange-300 hover:text-orange-500'
+                className='text-orange-300 hover:text-orange-500 cursor-pointer'
               />
             </DialogTrigger>
             <EditTaskModal

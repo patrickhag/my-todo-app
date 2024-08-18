@@ -1,10 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import ReactQueryProvider from '../lib/ReactQueryProvider'
 import AuthProvider from '../lib/Provider'
-
-const inter = Inter({ subsets: ['latin'] })
+import { openSans } from './components/ui/fonts'
 
 export const metadata: Metadata = {
   title: 'Todo App - Next.js',
@@ -17,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={inter.className}>
+      <body className={openSans.className}>
         <AuthProvider>
           <ReactQueryProvider>{children}</ReactQueryProvider>
         </AuthProvider>
