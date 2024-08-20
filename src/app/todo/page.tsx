@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { todoData, todoSchema } from '@/src/lib/schema'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { FcDeleteDatabase } from 'react-icons/fc'
+import { GoTasklist } from 'react-icons/go'
 import TodoItem from '../components/TodoItem'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -10,6 +10,8 @@ import { addTodo, clearCompletedTodos, getTodos } from '@/src/lib/todoApi'
 import Header from '../components/Header'
 import { Button } from '../components/ui/button'
 import { useSession } from 'next-auth/react'
+import { BulletList } from 'react-content-loader'
+import Loader from '../components/Loader'
 
 export default function Todo() {
   const {
@@ -23,7 +25,7 @@ export default function Todo() {
 
   const { data: session } = useSession()
 
-  const userId = session?.user?.id
+  const userId = session?.user?.id as string
 
   useEffect(() => {
     if (errors.text) {
@@ -36,21 +38,19 @@ export default function Todo() {
     }
   }, [errors.text])
 
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['todos'] || [],
-    queryFn: async () => await getTodos(userId!),
+  const {
+    data: todos = { data: [] },
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['todos', userId],
+    queryFn: async () => (userId ? await getTodos(userId) : { data: [] }),
+    enabled: !!userId,
   })
 
-  const todoData = data?.data
-
   const addTodoMutation = useMutation({
-    mutationFn: ({
-      userId,
-      data,
-    }: {
-      userId: string | undefined
-      data: todoData
-    }) => addTodo(userId!, data),
+    mutationFn: ({ userId, data }: { userId: string; data: todoData }) =>
+      addTodo(userId!, data),
     onSuccess: () => {
       refetch()
       reset()
@@ -87,41 +87,51 @@ export default function Todo() {
                 className='absolute right-0 top-0 min-h-full px-4 text-white bg-blue-500 rounded-lg'
                 type='submit'
               >
-                {addTodoMutation.isPending ? 'Adding...' : 'Add'}
+                {addTodoMutation.isPending ? (
+                  <Loader text='Adding...' />
+                ) : (
+                  'Add'
+                )}
               </Button>
             </form>
           </div>
           {showError && errors.text && (
-            <p className='text-red-500 text-xs font-light my-3'>
+            <p className='text-[#721c24] text-xs font-light my-3 border-[#f8d7da] bg-[#f8d7da] rounded-md p-2'>
               {errors.text.message}
             </p>
           )}
-          <div className='bg-[#F1ECE6] shadow-md rounded-xl p-6'>
-            {isLoading ? (
-              <p>Loading...</p>
-            ) : isError ? (
-              <p>Retrying...</p>
-            ) : (
-              <ul>
-                {todoData?.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} />
-                ))}
-              </ul>
-            )}
-            {todoData?.length === 0 && (
-              <p className='text-gray-400'>No tasks yet. Add them instead!</p>
-            )}
-            {(todoData?.length ?? 0) > 0 && (
+
+          {isLoading && (
+            <div className='bg-[#F1ECE6] shadow-md rounded-xl p-6 text-center'>
+              <BulletList />
+            </div>
+          )}
+          <div
+            className={`${
+              todos?.data.length!! === 0 ? 'hidden' : 'block'
+            } bg-[#F1ECE6] shadow-md rounded-xl p-6 text-center`}
+          >
+            <ul>
+              {todos?.data.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} />
+              ))}
+            </ul>
+            {todos?.data.length!! > 0 && (
               <div className='flex justify-end'>
                 <Button
                   className='mt-4 flex items-center space-x-2 border bg-blue-500'
                   onClick={() => clearCompletedTodosMutation.mutate()}
+                  disabled={!todos.data.some((todo) => todo.done)}
                 >
-                  <FcDeleteDatabase />
                   <span>
-                    {clearCompletedTodosMutation.isPending
-                      ? 'Clearing...'
-                      : 'Clear completed'}
+                    {clearCompletedTodosMutation.isPending ? (
+                      <Loader text='Clearing...' />
+                    ) : (
+                      <div className='flex items-center py-3'>
+                        <GoTasklist size={20} />
+                        <span className='ml-2 text-sm'>Clear completed</span>
+                      </div>
+                    )}
                   </span>
                 </Button>
               </div>

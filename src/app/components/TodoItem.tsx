@@ -16,9 +16,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/src/app/components/ui/alert-dialog'
+import { IoRadioButtonOffOutline } from 'react-icons/io5'
 import { useState } from 'react'
 import { Dialog, DialogTrigger } from './ui/dialog'
 import EditTaskModal from './EditModal'
+import Loader from './Loader'
 
 export default function TodoItem({ todo }: { todo: TodoType }) {
   const queryClient = useQueryClient()
@@ -49,7 +51,7 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
 
   return (
     <>
-      <li className='flex items-center justify-between mb-2 my-5'>
+      <div className='flex items-center justify-between mb-2 my-5'>
         <div className='flex items-center'>
           {todo.done ? (
             <SiTicktick
@@ -58,12 +60,15 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
               onClick={handleDoneTask}
             />
           ) : (
-            <input
-              type='radio'
-              onClick={handleDoneTask}
-              className='border-[#737373] cursor-pointer appearance-none mr-2 border-2 rounded-full p-3'
-              title='Mark as done'
-            />
+            <div className='relative group'>
+              <IoRadioButtonOffOutline
+                onClick={handleDoneTask}
+                className='border-[#737373] cursor-pointer appearance-none mr-2 border-2 rounded-full p-3'
+              />
+              <span className='opacity-0 group-hover:opacity-100 transition-opacity absolute top-[-35px] left-0 bg-gray-700 text-white text-sm rounded px-2 py-1'>
+                Complete
+              </span>
+            </div>
           )}
           <span
             className={`flex-1 ${
@@ -76,11 +81,13 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
         <div className='flex'>
           <AlertDialog open={isDeleteDialogOpen}>
             <AlertDialogTrigger asChild>
-              <MdDeleteOutline
-                size={25}
-                className='text-orange-300 hover:text-orange-500 mr-3 cursor-pointer'
-                onClick={() => setIsDeleteDialogOpen(true)}
-              />
+              <span>
+                <MdDeleteOutline
+                  size={25}
+                  className='text-orange-300 hover:text-orange-500 mr-3 cursor-pointer'
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                />
+              </span>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -98,17 +105,23 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
                   disabled={deleteMutation.isPending}
                   className='bg-red-600 hover:bg-red-800 '
                 >
-                  {deleteMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
+                  {deleteMutation.isPending ? (
+                    <Loader text='Deleting...' />
+                  ) : (
+                    'Yes, Delete'
+                  )}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
             <DialogTrigger asChild>
-              <FaEdit
-                size={20}
-                className='text-orange-300 hover:text-orange-500 cursor-pointer'
-              />
+              <span>
+                <FaEdit
+                  size={20}
+                  className='text-orange-300 hover:text-orange-500 cursor-pointer'
+                />
+              </span>
             </DialogTrigger>
             <EditTaskModal
               id={todo.id!}
@@ -118,8 +131,8 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
             />
           </Dialog>
         </div>
-      </li>
-      <div className='border-b border-b-[#76B7CD]'></div>
+      </div>
+      <div className='border-b border-b-[#76B7CD] my-3'></div>
     </>
   )
 }

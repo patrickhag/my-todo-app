@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { nullable, z } from 'zod'
 
 export const todoSchema = z.object({
   text: z
@@ -8,7 +8,6 @@ export const todoSchema = z.object({
     .trim(),
   description: z
     .string()
-    .min(10, { message: 'Description is required' })
     .max(300, { message: 'Description is too long' })
     .optional(),
   done: z.boolean().default(false),

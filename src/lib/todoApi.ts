@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { API_URL } from './definitions'
-import { TodoType } from './types'
+import { TodoResponse, TodoType } from './types'
 
 export async function getTodos(userId: string) {
   try {
