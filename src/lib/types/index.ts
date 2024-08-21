@@ -7,6 +7,10 @@ export type TodoType = {
   done: boolean
 }
 
+export type TodoResponse = {
+  data: TodoType[]
+}
+
 export type User = {
   id: string
   email: string

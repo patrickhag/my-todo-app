@@ -11,8 +11,11 @@ import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { updateTodo } from '@/src/lib/todoApi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { todoData, todoSchema } from '@/src/lib/schema'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { todoData } from '@/src/lib/schema'
+import { useEffect } from 'react'
+import { Textarea } from '@/components/ui/textarea'
+import { TodoType } from '@/src/lib/types'
+import Loader from './Loader'
 
 export default function EditTaskModal({
   id,
@@ -31,16 +34,11 @@ export default function EditTaskModal({
     register,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<todoData>({
-    defaultValues: {
-      text: task,
-      description: description,
-    },
-    resolver: zodResolver(todoSchema),
-  })
+    setValue,
+  } = useForm<TodoType>()
 
   const mutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: todoData }) =>
+    mutationFn: ({ id, data }: { id: string; data: TodoType }) =>
       updateTodo(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] })
@@ -48,9 +46,14 @@ export default function EditTaskModal({
     },
   })
 
-  const onSubmit: SubmitHandler<todoData> = (data) => {
+  const onSubmit: SubmitHandler<TodoType> = (data) => {
     mutation.mutate({ id, data })
   }
+
+  useEffect(() => {
+    setValue('text', task)
+    setValue('description', description)
+  }, [description, task, setValue])
 
   return (
     <DialogContent className='sm:max-w-[425px]'>
@@ -71,10 +74,10 @@ export default function EditTaskModal({
           <Label htmlFor='description' className='text-start'>
             Description
           </Label>
-          <Input
+          <Textarea
             id='description'
             {...register('description')}
-            className='col-span-3'
+            className=' col-span-3 resize-none'
           />
         </div>
         <DialogFooter>
@@ -83,7 +86,11 @@ export default function EditTaskModal({
             disabled={isSubmitting || mutation.isPending}
             className='bg-blue-500'
           >
-            {isSubmitting || mutation.isPending ? 'Saving...' : 'Save changes'}
+            {isSubmitting || mutation.isPending ? (
+              <Loader text='Saving...' />
+            ) : (
+              'Save changes'
+            )}
           </Button>
         </DialogFooter>
       </form>
