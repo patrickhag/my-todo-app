@@ -107,15 +107,18 @@ export default function Todo() {
             </div>
           )}
           <div
-            className={`${
-              todos?.data.length!! === 0 ? 'hidden' : 'block'
-            } bg-[#F1ECE6] shadow-md rounded-xl p-6 text-center`}
+            className={`
+             bg-[#F1ECE6] shadow-md rounded-xl p-6 text-center`}
           >
-            <ul>
-              {todos?.data.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} />
-              ))}
-            </ul>
+            {todos.data.length!! === 0 ? (
+              <p className='text-gray-500'>No todos yet. Add them instead!</p>
+            ) : (
+              <ul>
+                {todos.data.map((todo) => (
+                  <TodoItem key={todo.id} todo={todo} />
+                ))}
+              </ul>
+            )}
             {todos?.data.length!! > 0 && (
               <div className='flex justify-end'>
                 <Button
