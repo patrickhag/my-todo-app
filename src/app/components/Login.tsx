@@ -3,6 +3,8 @@ import React from 'react'
 import { Button } from './ui/button'
 import { openSans, pattaya } from './ui/fonts'
 import { signIn } from '@/src/auth'
+import gitHub from '../../../public/github-icon.svg'
+import gmail from '../../../public/google-icon.svg'
 
 export default async function Login() {
   ;('use client')
@@ -26,7 +28,7 @@ export default async function Login() {
           >
             <Button className='bg-gray-200 hover:bg-gray-300 text-black py-2 px-4 rounded flex items-center justify-center w-40 mb-4 mx-auto'>
               <Image
-                src={'/github-icon.svg'}
+                src={gitHub}
                 alt='GitHub'
                 className='h-6 w-6 mr-2'
                 width={30}
@@ -46,7 +48,7 @@ export default async function Login() {
           >
             <Button className='bg-gray-200 hover:bg-gray-300 text-black py-2 px-4 rounded flex items-center justify-center w-40 mx-auto'>
               <Image
-                src={'/google-icon.svg'}
+                src={gmail}
                 alt='Google'
                 className='h-6 w-6 mr-2'
                 width={30}

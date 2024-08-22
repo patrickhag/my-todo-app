@@ -13,7 +13,7 @@ import { updateTodo } from '@/src/lib/todoApi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { todoData } from '@/src/lib/schema'
 import { useEffect } from 'react'
-import { Textarea } from '@/components/ui/textarea'
+import { Textarea } from '@/src/app/components/ui/textarea'
 import { TodoType } from '@/src/lib/types'
 import Loader from './Loader'
 
