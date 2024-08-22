@@ -101,22 +101,20 @@ export default function Todo() {
             </p>
           )}
 
-          {isLoading && (
-            <div className='bg-[#F1ECE6] shadow-md rounded-xl p-6 text-center'>
+          <div className='bg-[#F1ECE6] shadow-md rounded-xl p-6 text-center'>
+            {isLoading ? (
               <BulletList />
-            </div>
-          )}
-          <div
-            className={`${
-              todos?.data.length!! === 0 ? 'hidden' : 'block'
-            } bg-[#F1ECE6] shadow-md rounded-xl p-6 text-center`}
-          >
-            <ul>
-              {todos?.data.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} />
-              ))}
-            </ul>
-            {todos?.data.length!! > 0 && (
+            ) : todos?.data.length > 0 ? (
+              <ul>
+                {todos.data.map((todo) => (
+                  <TodoItem key={todo.id} todo={todo} />
+                ))}
+              </ul>
+            ) : (
+              <p className='text-gray-500'>No tasks yet. Add them instead!</p>
+            )}
+
+            {!!todos?.data.length && todos.data.length > 0 && (
               <div className='flex justify-end'>
                 <Button
                   className='mt-4 flex items-center space-x-2 border bg-blue-500'
