@@ -9,12 +9,10 @@ import {
 } from './ui/dialog'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import Loader from './Loader'
-import { updateTodo } from '@/lib/todo-api'
 import { TodoType } from '@/types'
-import { toast } from './ui/use-toast'
+import { useUpdateTodo } from '@/hooks'
 
 export default function EditTaskModal({
   id,
@@ -25,8 +23,6 @@ export default function EditTaskModal({
   task: string
   setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-  const queryClient = useQueryClient()
-
   const {
     register,
     handleSubmit,
@@ -34,17 +30,7 @@ export default function EditTaskModal({
     setValue,
   } = useForm<TodoType>()
 
-  const mutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: TodoType }) =>
-      updateTodo(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todos'] })
-      setIsEditDialogOpen(false)
-      toast({
-        description: `Todo updated successfully!`,
-      })
-    },
-  })
+  const mutation = useUpdateTodo(setIsEditDialogOpen)
 
   const onSubmit: SubmitHandler<TodoType> = (data) => {
     mutation.mutate({ id, data })

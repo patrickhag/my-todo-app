@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS "todos" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"done" boolean DEFAULT false NOT NULL,
 	"text" text NOT NULL,
-	"description" text
+	"description" text,
+	CONSTRAINT "todos_text_unique" UNIQUE("text")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user" (

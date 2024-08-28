@@ -24,7 +24,7 @@ export const todo = pgTable('todos', {
   userId: text('userId').references(() => users.id, { onDelete: 'cascade' }),
   id: uuid('id').primaryKey().defaultRandom(),
   done: boolean('done').default(false).notNull(),
-  text: text('text').notNull(),
+  text: text('text').notNull().unique(),
   description: text('description'),
 })
 

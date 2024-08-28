@@ -2,6 +2,7 @@ import { db } from '@/db/drizzle'
 import { todo, users } from '@/db/schema'
 import { todoSchema } from '@/lib/schema'
 import { ParamType } from '@/types'
+import { error } from 'console'
 import { asc, eq, not } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -42,8 +43,8 @@ export async function POST(
 
     if (existingTodo.length > 0) {
       return NextResponse.json(
-        { message: 'Todo already exists' },
-        { status: 400 }
+        { message: 'Todo already exists. Add new instead!' },
+        { status: 404 }
       )
     }
 
@@ -164,12 +165,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Todo Not Found' }, { status: 404 })
     }
 
-    await db
+    const updateStatusOfTodo = await db
       .update(todo)
       .set({
         done: not(todo.done),
       })
       .where(eq(todo.id, id))
+      .returning()
+
+    if (updateStatusOfTodo.length > 0) {
+      return NextResponse.json(
+        { message: 'Todo status updated successfully!' },
+        { status: 200 }
+      )
+    }
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
