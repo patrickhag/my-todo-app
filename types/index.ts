@@ -8,20 +8,8 @@ export type TodoType = {
   message?: string
 }
 
-export type Error = {
-  message: string
-}
-
-export type TodoResponse = {
-  data: TodoType[]
-}
-
 export type User = {
   id: string
   email: string
   name: string
-}
-
-export type addTodoDataReponse = {
-  message: string
 }

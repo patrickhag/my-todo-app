@@ -1,28 +1,25 @@
 'use client'
-import React, { useEffect, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { GoTasklist } from 'react-icons/go'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useSession } from 'next-auth/react'
 import { BulletList } from 'react-content-loader'
-import { todoData, todoSchema } from '@/lib/schema'
+import { todoSchema } from '@/lib/schema'
 import TodoItem from '@/components/TodoItem'
-import { clearCompletedTodos, addTodo } from '@/lib/todo-api'
 import { Button } from '@/components/ui/button'
 import Loader from '@/components/Loader'
 import Header from '@/components/Header'
-import { useTodos } from '@/hooks/useTodos'
-import { toast } from '@/components/ui/use-toast'
+import { useClearCompletedTodo, useCreateTodo, useTodos } from '@/hooks'
 import { TodoType } from '@/types'
 
 export default function Todo() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
     reset,
-  } = useForm<todoData>({ resolver: zodResolver(todoSchema) })
+    formState: { errors },
+  } = useForm<TodoType>({ resolver: zodResolver(todoSchema) })
 
   const [showError, setShowError] = useState(false)
   const { data: session } = useSession()
@@ -42,34 +39,13 @@ export default function Todo() {
 
   const { data: todos, isLoading, refetch } = useTodos(userId)
 
-  const addTodoMutation = useMutation({
-    mutationFn: ({ userId, data }: { userId: string; data: TodoType }) =>
-      addTodo(userId!, data),
-    onSuccess: (data) => {
-      refetch()
-      reset()
-      toast({
-        description: `Todo added successfully!`,
-      })
-    },
-    onError: (data) => {
-      toast({
-        variant: 'destructive',
-        description: `Todo already eixists!`,
-      })
-    },
-  })
+  const addTodoMutation = useCreateTodo(userId, reset)
 
-  const onSubmit: SubmitHandler<todoData> = (data) => {
-    addTodoMutation.mutate({ userId, data })
+  const onSubmit: SubmitHandler<TodoType> = (data) => {
+    addTodoMutation.mutate(data)
   }
 
-  const clearCompletedTodosMutation = useMutation({
-    mutationFn: clearCompletedTodos,
-    onSuccess: () => {
-      refetch()
-    },
-  })
+  const clearCompletedTodosMutation = useClearCompletedTodo()
 
   return (
     <>
@@ -85,10 +61,10 @@ export default function Todo() {
                 className='w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500'
                 placeholder='What do you need to do?'
               />
-
               <Button
                 className='absolute right-0 top-0 min-h-full px-4 text-white bg-blue-500 rounded-lg'
                 type='submit'
+                disabled={addTodoMutation.isPending}
               >
                 {addTodoMutation.isPending ? (
                   <Loader text='Adding...' />

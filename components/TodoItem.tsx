@@ -1,10 +1,8 @@
 'use client'
 import { TodoType } from '@/types'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FaEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 import { SiTicktick } from 'react-icons/si'
-import { deleteTodo, updateStatusTodo } from '@/lib/todo-api'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,36 +19,21 @@ import { useState } from 'react'
 import { Dialog, DialogTrigger } from './ui/dialog'
 import EditTaskModal from './EditModal'
 import Loader from './Loader'
-import { toast } from './ui/use-toast'
+import { useDeleteTodo, useUpdateStatus } from '@/hooks'
 
 export default function TodoItem({ todo }: { todo: TodoType }) {
-  const queryClient = useQueryClient()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const mutation = useMutation({
-    mutationFn: updateStatusTodo,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todos'] })
-    },
-  })
+  const handleCompletedTodoMutation = useUpdateStatus()
 
   const handleDoneTask = () => {
-    mutation.mutate(todo.id!)
+    handleCompletedTodoMutation.mutate(todo.id!)
   }
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteTodo,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todos'] })
-      setIsDeleteDialogOpen(false)
-      toast({
-        description: `Todo deleted successfully!`,
-      })
-    },
-  })
+  const deleteMutation = useDeleteTodo(todo.id!, setIsDeleteDialogOpen)
 
   const handleDeleteTodo = () => {
-    deleteMutation.mutate(todo.id!)
+    deleteMutation.mutate()
   }
 
   return (
@@ -63,6 +46,8 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
               size={28}
               onClick={handleDoneTask}
             />
+          ) : handleCompletedTodoMutation.isPending ? (
+            <Loader typeOfLoader={true} />
           ) : (
             <div className='relative group'>
               <IoRadioButtonOffOutline
